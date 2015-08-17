@@ -3,7 +3,7 @@ mini canvas project
 
 To run this project just follow the next steps:
 
-1. Create a folder called: huge-challenge in your LAMP server
+1. Create a folder called: huge-challenge in the root of your LAMP server
 
 2. Download fonts from github.com using the command,
 
@@ -14,4 +14,4 @@ replace <yourdomain> by your domain name:
 
 http://<yourdomain>/huge-challenge/
 
-4. Check for the documentation in the quick help displayed.
+4. Learn about the commands that you can use, in the quick help displayed.
