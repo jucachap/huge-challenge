@@ -10,8 +10,8 @@ To run this project just follow the next steps:
 git clone https://github.com/jucachap/huge-challenge huge-challenge
 
 3. In a browser load the app using the domain or IP address of your server host, 
-replace <yourdomain> by your domain name:
+replace YOURDOMAIN by your domain name:
 
-http://<yourdomain>/huge-challenge/
+http://YOURDOMAIN/huge-challenge/
 
 4. Learn about the commands that you can use, in the quick help displayed.
