@@ -1,7 +1,5 @@
 <?php
 
-include_once( 'messages.class.php' );
-
 /**
  * Class in charge to create the canvas and handle all actions over it.
  * @package default
@@ -12,7 +10,6 @@ class canvas{
 	//Class Attributes
 	private $canvas       = array();
 	private $canvas_ready = false;
-	private $message      = null;
 
 	/**
 	 * Constructor of the class, this initialize the canvas structure with 2-dimensional array
@@ -22,7 +19,6 @@ class canvas{
 	 * @return void
 	 */
 	public function __construct( $width = 0, $height = 0, $reset = false ){
-		$this->message = new messages();
 		if( $reset ){
 			$this->message->set_message( 'general-ok-0' );
 		}
@@ -35,15 +31,14 @@ class canvas{
 				$this->canvas[$f] = $column;
 			}
 			$this->fill_canvas();
-			$this->message->set_message( 'general-ok-0' );
 		}
 		else{
-			$this->message->set_message( 'canvas-error-0' );
+			;
 		}
 	}
 
 	/**
-	 * This function is in charge to fill the boundaries of the canvas and put blank spaces in
+	 * This method is in charge to fill the boundaries of the canvas and put blank spaces in
 	 * the content. When it has finished the attribute $canvas_ready is set to true.
 	 * @return boolean
 	 */
@@ -67,44 +62,53 @@ class canvas{
 	}
 
 	/**
-	 * This function is in charge of convert 2-dimensional array to its string representation.
+	 * This method is in charge of convert 2-dimensional array into its string representation.
 	 * @return string
 	 */
-	public function get_canvas_string( $init_message = false ){
+	public function get_canvas_string( &$messages ){
 		$canvas_printed = '';
-		for( $i=0; $i<count($this->canvas); $i++ ){
-			for( $j=0; $j<count($this->canvas[$i]); $j++ ){
 
-				if ( $j == ( count($this->canvas[$i])-1 ) ) {
-					$canvas_printed .=  $this->canvas[$i][$j] . '<br />';
-				}
-				else{
-					$canvas_printed .= $this->canvas[$i][$j];
-				}
-			}
+		if( $messages->get_reload() ){
+			$canvas_printed = $messages->get_init_message();
 		}
+		elseif( $this->canvas_ready ){
+			for( $i=0; $i<count($this->canvas); $i++ ){
+				for( $j=0; $j<count($this->canvas[$i]); $j++ ){
 
-		$canvas_printed = substr($canvas_printed, 0, -6);
+					if ( $j == ( count($this->canvas[$i])-1 ) ) {
+						$canvas_printed .=  $this->canvas[$i][$j] . '<br />';
+					}
+					else{
+						$canvas_printed .= $this->canvas[$i][$j];
+					}
+				}
+			}	
+			$canvas_printed = substr($canvas_printed, 0, -6);
+		}
+		else
+			return false;
 
-		return !$init_message?$canvas_printed.'<br/>'.$this->message->get_current_message():$this->message->get_init_message().'<br/>Command OK';
+		return $canvas_printed;
 	}
 
 	/**
-	 * From an string canvas representation, it is converted to a 2-dimensional array ( get_canvas_string inverse method )
+	 * From the string canvas representation passed as argument, it is converted to 2-dimensional array ( get_canvas_string inverse method )
 	 * @param string $canvas_string 
 	 * @return boolean
 	 */
 	public function parse_canvas_string_to_array( $canvas_string = '' ){
 
+		$files_canvas = explode('<br />', $canvas_string);
 		if( $canvas_string ){
-			$files_canvas = explode('<br />', $canvas_string);
 			for($i=0;$i<count($files_canvas); $i++){
 				$this->canvas[$i] = str_split( $files_canvas[$i] );
 			}
+
 			$this->canvas_ready = true;
+			return true;
 		}
 		
-		return true;
+		return false;
 	}
 
 	/**
@@ -140,9 +144,8 @@ class canvas{
 	 * @return boolean
 	 */
 	public function draw_line( $pinit = array(), $pend = array() ){
-		$this->message = new messages();
+
 		if( !$this->canvas_ready ){
-			$this->message->set_message( 'line-error-1' );
 			return false;
 		}
 		//horizontal line
@@ -151,7 +154,6 @@ class canvas{
 
 				$this->draw_point( array( $i, $pinit[1] ) );
 			}
-			$this->message->set_message( 'general-ok-0' );
 			return true;
 		}
 		//vertical line
@@ -160,11 +162,9 @@ class canvas{
 
 				$this->draw_point( array( $pinit[0], $i ) );
 			}
-			$this->message->set_message( 'general-ok-0' );
 			return true;
 		}
 		else{
-			$this->message->set_message( 'line-error-0' );
 			return false;
 		}
 		
@@ -178,17 +178,14 @@ class canvas{
 	 * @return boolean
 	 */
 	public function draw_rectangle( $pinit = array(), $pend = array() ){
-		$this->message = new messages();
 		//the points given are the same point
 		if( $pinit == $pend ){
 			$this->draw_point( $pinit );
-			$this->message->set_message('general-ok-0');
 			return true;
 		}
 		//the points given are a line, they are not a rectangle
 		elseif( $pinit[0] == $pend[0] || $pinit[1] == $pend[1] ){
 			$this->draw_line( $pinit, $pend );
-			$this->message->set_message('general-ok-0');
 			return true;
 		}
 		//rectangle
@@ -197,7 +194,6 @@ class canvas{
 			$this->draw_line( array( $pend[0], $pinit[1] ), $pend );
 			$this->draw_line( array( $pinit[0], $pend[1] ), $pend );
 			$this->draw_line( $pinit, array( $pinit[0], $pend[1] ) );
-			$this->message->set_message('general-ok-0');
 			return true;
 		}
 	}
@@ -213,7 +209,7 @@ class canvas{
 	 * @return boolean
 	 */
 	public function bucket_fill( $init = array(), $char = '' ){
-		$this->message = new messages();
+
 		if( !in_array( $this->get_point( $init ), array( '|', '-', 'x', $char[0] ) ) ){
 			$this->draw_point( $init, $char );	
 			$this->fill_r( array( $init[0]+1, $init[1] ), $char );
@@ -221,7 +217,6 @@ class canvas{
 			$this->fill_u( array( $init[0], $init[1]-1 ), $char );
 			$this->fill_d( array( $init[0], $init[1]+1 ), $char );
 		}
-		$this->message->set_message('general-ok-0');
 		return true;	
 	}
 
@@ -242,5 +237,9 @@ class canvas{
 	}
 
 	/** End recursiveness **/
+
+	public function get_canvas_state(){
+		return $this->canvas_ready;
+	}
 }
 

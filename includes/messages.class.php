@@ -9,15 +9,23 @@
 class messages{
 
 	//Class Attributes
+	private $reload = false;
 	private $current_message = '';
+	private $init_message = "Quick help:
+C N N :		Command C creates a canvas of NxN
+L N N M M :	Command L draws a line from point (N,N) until (M,M) inside of canvas
+R N N M M :	Command R draws a rectangle from point (N,N) until (M,M) inside of canvas
+B N N char:	Command B fills the space arround point (N,N) with character char";
 	private $messages        = array(
 								'general' => array(
 									'ok' => array(
 										'Command OK',
 										),
-									),
 									'error' => array(
+										'Command incorrect',
 										),
+									),
+									
 								'canvas' => array(
 									'ok' => array(
 										),
@@ -48,9 +56,21 @@ class messages{
 	 * @return boolean
 	 */
 	public function set_message( $key = '' ){
-		$message_array = explode('-', $key);
-		$this->current_message = $this->messages[$message_array[0]][$message_array[1]][$message_array[2]];
-		return true;
+		$key_array = explode('-', $key);
+
+		//print_r( $key_array );
+		//print_r( $this->messages[$key_array[0]][$key_array[1]][$key_array[2]] );exit;
+
+		if( $key == 'quit' ){
+			$this->current_message = $this->get_init_message();
+			return true;
+		}
+		elseif( $key && count($key_array) == 3 ){
+			$this->current_message = $this->messages[$key_array[0]][$key_array[1]][$key_array[2]];
+			return true;
+		}
+		else
+			return false;
 	}
 
 	/**
@@ -59,11 +79,7 @@ class messages{
 	 * @return string
 	 */
 	public function get_init_message(){
-		return "Quick help:
-C N N :		Command C creates a canvas of NxN
-L N N M M :	Command L draws a line from point (N,N) until (M,M) inside of canvas
-R N N M M :	Command R draws a rectangle from point (N,N) until (M,M) inside of canvas
-B N N char:	Command B fills the space arround point (N,N) with character char";
+		return $this->init_message;
 	}
 
 	/**
@@ -72,6 +88,17 @@ B N N char:	Command B fills the space arround point (N,N) with character char";
 	 */
 	public function get_current_message(){
 		return $this->current_message;
+	}
+
+	public function is_reload(){
+		$this->reload = true;
+		return true;
+	}
+
+	public function get_reload(){
+		$reply = $this->reload;
+		$this->reload = false;
+		return $reply;
 	}
 
 }
