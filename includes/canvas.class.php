@@ -19,10 +19,7 @@ class canvas{
 	 * @return void
 	 */
 	public function __construct( $width = 0, $height = 0, $reset = false ){
-		if( $reset ){
-			$this->message->set_message( 'general-ok-0' );
-		}
-		elseif( $width > 1 && $width <= 100 && $height > 1 && $height <= 20 ){
+		if( $width > 1 && $width <= 100 && $height > 1 && $height <= 20 ){
 			for( $f=0; $f < $height+2; $f++ ){
 				$column = array();
 				for( $c=0; $c < $width+2; $c++ ){
@@ -33,7 +30,7 @@ class canvas{
 			$this->fill_canvas();
 		}
 		else{
-			;
+			;//do nothing
 		}
 	}
 
